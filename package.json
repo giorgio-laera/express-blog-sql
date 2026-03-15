@@ -1,0 +1,16 @@
+{
+  "name": "express-blog-routing",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node api.js",
+    "dev": "node --watch api.js"
+  },
+  "author": "giorgio laera",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^5.2.1",
+    "mysql2": "^3.19.1"
+  }
+}
