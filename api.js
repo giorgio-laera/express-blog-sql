@@ -6,7 +6,7 @@ const errorsHandler= require('./middlewares/errorsHandler')
 const port =3000
 
 
-app.use(express.static('public'));
+app.use(express.static('./data/db'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/posts', postsRouter);

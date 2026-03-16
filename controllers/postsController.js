@@ -57,6 +57,17 @@ function show(req, res) {
 
 function store(req, res) {
 	
+const {title, content, image}=req.body;
+const sqlQuery="INSERT INTO posts (title, content, image) VALUES (?, ?, ?)"
+dbConnection.query(sqlQuery,[title, content, image],(err,results)=>{
+	if(err){
+		return res.status(500).json({error:"DB Error" ,message:"Impossibile caricare la risorsa"})
+	}
+	res.status(201);
+	console.log(results)
+	res.json({ id:results.insertId})
+})
+}
 
 function update(req, res) {
 	const id = (req.params.id);
