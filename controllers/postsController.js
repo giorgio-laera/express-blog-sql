@@ -89,36 +89,84 @@ function update(req, res) {
 	}   if(results.affectedRows === 0){
 		return res.status(404).json({ error: "Not found", message: "Impossibile modificare una post non esistente" });
 	}
-	res.status(200).json({message: 'posts Updated'})
+	
+	const sqlQueryReturn= `SELECT * 
+					FROM posts
+					WHERE id= ? `;
+	dbConnection.query(sqlQueryReturn,[id],(err, results)=>{
+	res.status(200).json(results)
 	})
+	})
+	
 
 	
 }
 
 function modify(req, res) {
-	const id = (req.params.id)
-	const result = posts.find(post => post.id == id);
-
-	const title = req.body.title;
-	const content = req.body.content;
-	const image = req.body.img;
-	const tags = req.body.tags;
-
-	if (title) {
-		result.title = title;
-
-	} if (content) {
-		result.content = content;
-
-	} if (image) {
-		result.image = image;
-
-	} if (tags) {
-		result.tags = tags;
-
+	const id = Number(req.params.id);
+	if(isNaN(id)){
+		return res.status(400).json({error:"User error", massage:"L'id non e valido"})
 	}
-	console.log(result)
-	res.send(`hai Modificato (parzialmente) un elemento ${req.params.id} `);
+
+	const {title, content, image} =req.body;
+	console.log(image)
+
+	let parametryQuery =[title, content, image, id];
+	
+	let sqlQuery= `UPDATE posts 
+					SET title= ?, content= ? ,image= ?
+					WHERE id= ?`
+	
+	if(!title){
+		sqlQuery= `UPDATE posts 
+					SET  content= ?, image= ?
+					WHERE id= ?`;
+		parametryQuery =[ content, image, id];
+	}
+	if(!content){
+		sqlQuery= `UPDATE posts 
+					SET  title= ?, image= ?
+					WHERE id= ?`;
+		parametryQuery =[ title,image, id];
+	}
+	if(!image){
+		sqlQuery= `UPDATE posts 
+					SET  title= ?, content= ?
+					WHERE id= ?`;
+		parametryQuery =[ title, content, id];
+	}
+	if(!title && !content){
+		sqlQuery= `UPDATE posts 
+					SET  image= ?
+					WHERE id= ?`;
+		parametryQuery =[ image, id];
+	}
+	if(!title &&!image){
+		sqlQuery= `UPDATE posts 
+					SET content= ?
+					WHERE id= ?`;
+		parametryQuery =[  content, id];
+	}if(!content && !image){
+		sqlQuery= `UPDATE posts 
+					SET  title= ?
+					WHERE id= ?`;
+		parametryQuery =[ title, id];
+	}
+	dbConnection.query(sqlQuery, parametryQuery,(err, results)=>{
+		if(err){
+			console.log(err)
+		return res.status(500).json({error:"DB Error" ,message:"Impossibile caricare la risorsa"})
+	}   if(results.affectedRows === 0){
+		return res.status(404).json({ error: "Not found", message: "Impossibile modificare una post non esistente" });
+	}
+	
+	const sqlQueryReturn= `SELECT * 
+					FROM posts
+					WHERE id= ? `;
+	dbConnection.query(sqlQueryReturn,[id],(err, results)=>{
+	res.status(200).json(results)
+	})
+	})
 }
 
 function destroy(req, res) {
