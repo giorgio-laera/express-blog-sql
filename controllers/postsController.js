@@ -70,17 +70,29 @@ dbConnection.query(sqlQuery,[title, content, image],(err,results)=>{
 }
 
 function update(req, res) {
-	const id = (req.params.id);
-	result = posts.find(post => post.id == id);
+	const id = Number(req.params.id);
+	if(isNaN(id)){
+		return res.status(400).json({error:"User error", massage:"L'id non e valido"})
+	}
 
+	const {title, content, image} =req.body;
 
-	result.title = req.body.title;
-	result.content = req.body.content
-	result.image = req.body.image
-	result.tags = req.body.tags
+	let parametryQuery =[title, content, image, id];
+	
+	const sqlQuery= `UPDATE posts 
+					SET title= ?, content= ? ,image= ?
+					WHERE id= ?`
+	dbConnection.query(sqlQuery, parametryQuery,(err, results)=>{
+		if(err){
+			console.log(err)
+		return res.status(500).json({error:"DB Error" ,message:"Impossibile caricare la risorsa"})
+	}   if(results.affectedRows === 0){
+		return res.status(404).json({ error: "Not found", message: "Impossibile modificare una post non esistente" });
+	}
+	res.status(200).json({message: 'posts Updated'})
+	})
 
-	res.status(200)
-	res.json(result)
+	
 }
 
 function modify(req, res) {
