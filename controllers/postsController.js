@@ -3,9 +3,22 @@ const dbConnection = require("../data/db");
 
 //const checkTime= require('../middlewares/checkTime')
 function index(req, res) {
-	const sqlQuery = "SELECT *FROM posts";
+	let sqlQuery = "SELECT *FROM posts";
+    let parametryQuery=[];
 
-	dbConnection.query(sqlQuery, (err, rows) => {
+	if (req.query.tag){
+	sqlQuery = `SELECT posts.* FROM blog.tags
+JOIN post_tag
+ON post_tag.tag_id =tags.id
+
+JOIN posts
+ON post_tag.post_id =posts.id
+
+WHERE label LIKE ?`;
+parametryQuery.push(req.query.tag)
+	}
+	console.log('parametry',parametryQuery)
+	dbConnection.query(sqlQuery, parametryQuery,(err, rows) => {
 		if (err) {
 			console.log(err);
 			return res.status(500).json({ error: 'DB error', message: 'errore nel recuperare i dati' });
